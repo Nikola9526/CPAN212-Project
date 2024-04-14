@@ -189,7 +189,7 @@ app.post('/register', async (req,res)=> {
     
     
 });*/
-
+// post endpoint for login 
 app.post('/login', async (req,res) => {
     
     try{
