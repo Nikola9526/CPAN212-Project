@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const LocalStrategy = require('passport-local').Strategy;
 
+
 const users = require('./routes/api/users');
 const profile = require('./routes/api/profile');
 const posts = require('./routes/api/posts');
@@ -31,23 +32,13 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 
-//Express sessions middleware configuration 
-//Sessions are used to keep users logged in between HTTP requsts.
-app.use(session({
-    secret:'secret', // Secret key for session (should be in random string in production)
-    resave: false, // Don't resave session if it hasn't changed
-    saveUninitialized:false // Don't create a session until something is stored
-}));
-
 
 // Passport Middleware
 //Intializing Passport for user  authentication and integrating it with Express sessions
 app.use(passport.initialize());
-//app.use(passport.session());
 
 //Passport Config
 require('./config/passport')(passport);
-
 
 mongoose.connect('mongodb://localhost:27017/recipeapp', {
     useUnifiedTopology: true
@@ -55,46 +46,6 @@ mongoose.connect('mongodb://localhost:27017/recipeapp', {
 .catch(() => console.log(err));
 
 
-
-
-passport.use(new LocalStrategy(
-    async (username, password, done) => {
-        console.log('in local strategy'), username;
-        try {
-            const user = await User.findOne({username});
-            if (!user) {
-                return done (null, false)
-            }
-            // if found user
-            if (await bcrypt.compare(password, user.password)) {
-                return done (null, user) // if matched password, authaicates the user
-
-            } else {
-                return done (null, false); // no match password, return false
-            }
-        }catch (err) {
-            console.log('here');
-            done (err) 
-        }
-    }
-));
-
-passport.serializeUser((user,done) => { // will run only when logged in
-    console.log("ID in serialize : ", user) // storeing user
-    done (null, user.id);
-});
-
-// Deserializeuser to retrive the user data from the session using the user id
-// once already logged in with /get session check
-passport.deserializeUser(async (id,done) => {
-    console.log("ID in deserialize : ", id);
-    try {
-        const user = await User.findById(id);
-        done (null, user); // The user object is attached to the request object as req.user
-    } catch (err) {
-        done (err, null);
-    }
-});
 
 /*app.post('/register', async (req,res)=> {
     try {
@@ -178,7 +129,7 @@ const requireAuth = (req,res,next) => {
     }
 };
 
-// fname: req.body.fname, 
+
 app.post('/recipeAdd', requireAuth, async  (req,res) => {
     //const { name, description,servingsize, ingredients, directions, note} =req.body;
     const info = req.body.arrayField;
@@ -225,6 +176,7 @@ app.get('/sessionCheck', (req,res) => {
 app.use('/api/users',users);
 app.use('/api/profile',profile);
 app.use('/api/posts',posts);
+
 
 
 
