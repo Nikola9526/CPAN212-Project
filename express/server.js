@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const jwt = require ('jsonwebtoken');
-const bcrypt = require ('bcrypt');
+//const jwt = require ('jsonwebtoken');
+//const bcrypt = require ('bcrypt');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -24,13 +24,7 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
-/*app.use(cors({
-    origin: "exp://10.0.0.30:8081",
-}));*/
 
-/*app.use (cors (  {
-    origin: "http://localhost:8081",
-}))*/
 
   //Body Parser middleware 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -46,10 +40,13 @@ app.use(session({
 }));
 
 
-
+// Passport Middleware
 //Intializing Passport for user  authentication and integrating it with Express sessions
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
+
+//Passport Config
+require('./config/passport')(passport);
 
 
 mongoose.connect('mongodb://localhost:27017/recipeapp', {
@@ -58,58 +55,7 @@ mongoose.connect('mongodb://localhost:27017/recipeapp', {
 .catch(() => console.log(err));
 
 
-const recipeSchema = new mongoose.Schema({
-    name : String,
-    description : String,
-    info : [
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-    ],
-    servingsize: String,
-    ingredients:[
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
 
-    ] ,
-   directions: [
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-        String,
-
-    ],
-    note: String,
-   
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }// reference to user
-})
-
-
-const Recipe = mongoose.model('Recipe', recipeSchema)
 
 passport.use(new LocalStrategy(
     async (username, password, done) => {
@@ -252,10 +198,7 @@ app.post('/recipeAdd', requireAuth, async  (req,res) => {
     res.status(201).json(recipes);
 });
 
-app.get ("/recipes", async (req,res) => {
-    const recipes = await Recipe.find().populate('user', 'username');
-    res.json(recipes);
-});
+
 
 app.get('/api/data', (req,res) => {
     const data= { message: 'Hello from express backend'};
@@ -286,7 +229,7 @@ app.use('/api/posts',posts);
 
 
 
-const port = process.env.PORT || 9000;
+const port = process.env.PORT || 9001;
 
 app.listen ( port , () => {
     console.log(`Server is Running on http://localhost:${port}`)
