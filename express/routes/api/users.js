@@ -1,9 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require ('bcrypt');
+const jwt = require ('jsonwebtoken');
+const keys = require('../../config/keys');
+const passport = require('passport');
+
+// Load  Input Validation
+const validateRegisterInput = require('../../validation/register');
+const validateLoginInput = require('../../validation/login');
 
 //Load User model
 const User = require('../../models/User');
+
+
 
 // @route GET api/users/test
 // @desc Tests users
@@ -19,10 +28,17 @@ router.get('/test' , (req,res) => {
 //@acess Public
 
 router.post('/register',  async (req,res) => { 
+    const {errors, isValid } = validateRegisterInput(req.body); // everything sent to this route
+    //check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
     User.findOne({email: req.body.email})
     .then(user => {
         if(user) {
-            return res.status(400).json({email: 'Email already exsits'});
+            errors.email = "Email already exists";
+            return res.status(400).json(errors);
         } else {
             //const hashedPassword = bcrypt.hash (req.body.password, 10);
             const user = new User ({ 
@@ -55,25 +71,47 @@ router.post('/register',  async (req,res) => {
 // @desc login User / Returning JWT Token
 //@acess Public
 
-router.post('/loginn', (req,res) => {
-    const username = req.body;
-    const password = req.body;
+router.post('/login', async (req,res) => {
+    const {errors, isValid } = validateLoginInput(req.body); // everything sent to this route
+    //check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
+    const username = req.body.username;
+    const password = req.body.password;
 
     //Find User by user
-    User.findOne({ username })
-        .then( user => {
+    User.findOne({ username }).then( user => {
             //Check for user
             if (!user) {
-                return res.status(404).json({username: "Username Not Found"});
+                errors.username = 'Username Not Found';
+                return res.status(404).json(errors);
 
             }
             //Check for password 
-            bcrypt.compare(password, user.password)
-                .then(isMatch => {
+            bcrypt.compare(password, user.password).then(isMatch => {
                     if(isMatch) {
-                        res.json({message: "Success"});
+                        //User found
+                        //res.json({message: "Success"});
+
+                        const payload = { id: user.id, fname: user.fname,lname: user.lname ,username: user.username, email: user.email, phonenum: user.phonenum} // Create jWT payload 
+
+                        //Sign Token
+                        jwt.sign(payload, keys.sercretOrKey, { expiresIn: 3600 } , ( err, token) => {
+                            res.json({
+                                success: true,
+                                token: 'Bearer ' + token
+                            });
+                            
+                        }); //Takes payload (user info) , experiation 
+
+
+
                     } else {
-                        return res.status(400).json({password: "Password Incorrect!"})
+                        errors.password = 'Password Incorrect';
+                        return res.status(400).json(errors);
+                        //return res.status(400).json({password: "Password Incorrect!"})
                     }
                 });
         });
@@ -81,6 +119,17 @@ router.post('/loginn', (req,res) => {
     
 });
 
+// @route GET api/users/current
+// @desc Return current user
+//@acess Prtive
+
+router.get('/current', passport.authenticate('jwt', { session  : false }), (req,res) => {
+    res.json( {
+        id: req.user.id,
+        fname: req.user.fname,
+        email: req.user.email
+    });
+});
 
 
 module.exports = router;
