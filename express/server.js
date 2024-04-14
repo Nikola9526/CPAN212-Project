@@ -8,6 +8,12 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const LocalStrategy = require('passport-local').Strategy;
 
+const users = require('./routes/api/users');
+const profile = require('./routes/api/profile');
+const posts = require('./routes/api/posts');
+
+
+
 const JWT_SECRET = 'your_jwt_secret';
 
 const app = express();
@@ -18,9 +24,9 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
-app.use(cors({
+/*app.use(cors({
     origin: "exp://10.0.0.30:8081",
-}));
+}));*/
 
 /*app.use (cors (  {
     origin: "http://localhost:8081",
@@ -281,9 +287,16 @@ app.get('/sessionCheck', (req,res) => {
 
 });
 
+//use Routes
+app.use('/api/users',users);
+app.use('/api/profile',profile);
+app.use('/api/posts',posts);
 
-const PORT = 9000;
 
-app.listen ( PORT, () => {
-    console.log(`Server is Running on http://localhost:${PORT}`)
+
+
+const port = process.env.PORT || 9000;
+
+app.listen ( port , () => {
+    console.log(`Server is Running on http://localhost:${port}`)
 });
