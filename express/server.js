@@ -32,9 +32,10 @@ app.use(cors(corsOptions));
     origin: "http://localhost:8081",
 }))*/
 
-   
-
+  //Body Parser middleware 
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
 
 //Express sessions middleware configuration 
 //Sessions are used to keep users logged in between HTTP requsts.
@@ -51,22 +52,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-const Schema = mongoose.Schema;
-
 mongoose.connect('mongodb://localhost:27017/recipeapp', {
     useUnifiedTopology: true
 }).then(() => console.log('Connected to Mongo Database'))
 .catch(() => console.log(err));
 
-const userSchema = new mongoose.Schema({
-    fname: String,
-    lname: String,
-    email: String,
-    phonenum: String,
-    username:String,
-    password: String,
-    
-});
+
 const recipeSchema = new mongoose.Schema({
     name : String,
     description : String,
@@ -117,7 +108,7 @@ const recipeSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }// reference to user
 })
 
-const User = mongoose.model('User', userSchema );
+
 const Recipe = mongoose.model('Recipe', recipeSchema)
 
 passport.use(new LocalStrategy(
@@ -159,7 +150,7 @@ passport.deserializeUser(async (id,done) => {
     }
 });
 
-app.post('/register', async (req,res)=> {
+/*app.post('/register', async (req,res)=> {
     try {
         const hashedPassword = await bcrypt.hash (req.body.password, 10);
         const user = new User ({ 
@@ -176,7 +167,7 @@ app.post('/register', async (req,res)=> {
     }catch (err) {
         res.status(500).send('Error Registering new user');
     }
-});
+});*/
 
 /*app.post ('/login', passport.authenticate('local'), (req,res) => {
  try {
@@ -196,7 +187,7 @@ app.post('/register', async (req,res)=> {
     
 });*/
 // post endpoint for login 
-app.post('/login', async (req,res) => {
+/*app.post('/login', async (req,res) => {
     
     try{
         const {username, password} = req.body;
@@ -220,7 +211,7 @@ app.post('/login', async (req,res) => {
     } catch(error) {
         res.status(500).send({ error: 'Internal Server Error'});
     }
-});
+});*/
 
 const requireAuth = (req,res,next) => {
     const { authorization } = req.headers;
