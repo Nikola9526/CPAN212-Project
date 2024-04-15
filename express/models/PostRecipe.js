@@ -57,34 +57,7 @@ const recipeSchema = new mongoose.Schema({
         type : Schema.Types.ObjectId,
         ref: 'User'
     }, 
-    likes: [
-        {
-            user: {
-                type : Schema.Types.ObjectId,
-                ref: 'User'
-            },
-        }
-    ],
-    comments: [
-        {
-            user: {
-                type : Schema.Types.ObjectId,
-                ref: 'User'
-            },
-            text: {
-                type: String // only enter this one
-            },
-            username: {
-                type: String
-            },
-            date: {
-                type: Date,
-                default: Date.now
-            }
 
-        }
-    ],
-    
     date: {
             type: Date,
             default: Date.now
