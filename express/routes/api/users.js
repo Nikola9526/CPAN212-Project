@@ -13,11 +13,9 @@ const validateLoginInput = require('../../validation/login');
 const User = require('../../models/User');
 
 
-
 // @route GET api/users/test
 // @desc Tests users
 //@acess Public
-
 
 router.get('/test' , (req,res) => {
     res.json({msg: "Users Works"});
@@ -58,6 +56,7 @@ router.post('/register',  async (req,res) => {
                     .catch(err => console.log(err));
                 })
             })
+            console.log("Worked");
 
 
           
@@ -101,11 +100,14 @@ router.post('/login', async (req,res) => {
                         jwt.sign(payload, keys.sercretOrKey, { expiresIn: 3600 } , ( err, token) => {
                             res.json({
                                 success: true,
-                                token: 'Bearer ' + token
+                                token: /*'Bearer ' */ token,
+                                username:  user.username
+                                
+                                
                             });
                             
                         }); //Takes payload (user info) , experiation 
-
+                        console.log("Worked");
 
 
                     } else {
