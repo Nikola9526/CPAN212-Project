@@ -6,10 +6,10 @@ module.exports = function validateRecipePostInput(data) {
 
     data.name = !isEmpty(data.name) ? data.name : '';
     data.description = !isEmpty(data.description) ? data.description : '';
-    data.info = !isEmpty(data.description) ? data.description : '';
+    //data.info = !isEmpty(data.description) ? data.description : '';
     data.servingsize = !isEmpty(data.servingsize) ? data.servingsize : '';
-    data.ingredients = !isEmpty(data.ingredients) ? data.ingredients : '';
-    data.directions = !isEmpty(data.directions) ? data.directions : '';
+    //data.ingredients = !isEmpty(data.ingredients) ? data.ingredients : '';
+    //data.directions = !isEmpty(data.directions) ? data.directions : '';
     data.note = !isEmpty(data.note) ? data.note : '';
     
     if (Validator.isEmpty(data.name )) {
