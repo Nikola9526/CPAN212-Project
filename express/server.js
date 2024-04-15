@@ -1,19 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-//const jwt = require ('jsonwebtoken');
-//const bcrypt = require ('bcrypt');
 const passport = require('passport');
 const bodyParser = require('body-parser');
-const session = require('express-session');
-const LocalStrategy = require('passport-local').Strategy;
-
 
 const users = require('./routes/api/users');
 const profile = require('./routes/api/profile');
 const posts = require('./routes/api/posts');
-
-
 
 const JWT_SECRET = 'your_jwt_secret';
 
@@ -25,13 +18,9 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
-
-
   //Body Parser middleware 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-
-
 
 // Passport Middleware
 //Intializing Passport for user  authentication and integrating it with Express sessions
@@ -132,7 +121,7 @@ const requireAuth = (req,res,next) => {
 
 app.post('/recipeAdd', requireAuth, async  (req,res) => {
     //const { name, description,servingsize, ingredients, directions, note} =req.body;
-    const info = req.body.arrayField;
+    //const info = req.body.arrayField;
     const userID = req.userId;
     const recipes = new Recipe ({
         name: req.body.name,
@@ -176,9 +165,6 @@ app.get('/sessionCheck', (req,res) => {
 app.use('/api/users',users);
 app.use('/api/profile',profile);
 app.use('/api/posts',posts);
-
-
-
 
 
 const port = process.env.PORT || 9001;
